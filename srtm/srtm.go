@@ -101,9 +101,9 @@ func parse(tileName string, bytes []byte) ([][]float64, error) {
 	var resolution int
 
 	if len(bytes) == 3601*3601*2 {
-		resolution = 3600
+		resolution = 3601
 	} else if len(bytes) == 1201*1201*2 {
-		resolution = 1200
+		resolution = 1201
 	} else {
 		log.Fatal("unknown SRTM data format")
 	}
@@ -112,9 +112,13 @@ func parse(tileName string, bytes []byte) ([][]float64, error) {
 
 	for i := 0; i < len(bytes); i += 2 {
 
+		if bytes[i] == 0x80 {
+			continue
+		}
+
 		index := i / 2
-		row := index / (resolution + 1)
-		col := index % (resolution + 1)
+		row := index / resolution
+		col := index % resolution
 
 		lat := float64(tlat) + float64(row)/float64(resolution)
 		lon := float64(tlon) + float64(col)/float64(resolution)
